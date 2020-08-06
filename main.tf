@@ -2,6 +2,8 @@ terraform {
   required_version = ">= 0.12"
 }
 
+data "aws_caller_identity" "current" {}
+
 resource "aws_kms_key" "sns_kms_key" {
   description             = "KMS key for ${var.name} sns to sms channel"
   policy = data.aws_iam_policy_document.sns_kms_key_policy.json
@@ -14,7 +16,17 @@ resource "aws_kms_alias" "sns_kms_key_alias" {
 }
 
 data "aws_iam_policy_document" "sns_kms_key_policy" {
-  policy_id = "sqs-sms-key-policy-${terraform.workspace}"
+  policy_id = "${var.name}-sqs-sms-key-policy"
+
+  statement {
+    sid = "Enable Administration"
+    actions = ["kms:*"]
+    principals {
+      type = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:*"]
+    }
+    resources = ["*"]
+  }
   
   statement {
     sid = "Enable IAM User Permissions"
