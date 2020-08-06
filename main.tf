@@ -15,7 +15,7 @@ resource "aws_kms_alias" "sns_kms_key_alias" {
 resource "aws_sns_topic" "sns_topic" {
   name = "${var.name}-sms-sns-topic"
   display_name = var.name
-  kms_master_key_id = aws_kms_alias.sns_kms_key_alias.name
+  #kms_master_key_id = aws_kms_alias.sns_kms_key_alias.name
 }
 
 data "aws_iam_policy_document" "sns_assume_role" {
