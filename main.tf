@@ -12,8 +12,6 @@ resource "aws_sns_topic" "sns_topic" {
 resource "aws_sns_topic_policy" "sns_from_source_account" {
   arn    = aws_sns_topic.sns_topic.arn
   policy = data.aws_iam_policy_document.publish_from_source_account_policy.json
-
-  tags = var.tags
 }
 
 data "aws_iam_policy_document" "publish_from_source_account_policy" {
@@ -47,6 +45,4 @@ resource "aws_sns_topic_subscription" "sns_sms_subscription" {
   topic_arn = aws_sns_topic.sns_topic.arn
   protocol  = "sms"
   endpoint  = element("${var.target_numbers}", count.index)
-
-  tags = var.tags
 }
