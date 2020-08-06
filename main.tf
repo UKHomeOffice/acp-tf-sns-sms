@@ -13,27 +13,27 @@ resource "aws_kms_alias" "sns_kms_key_alias" {
   target_key_id = aws_kms_key.sns_kms_key.key_id
 }
 
-data “aws_iam_policy_document” “sns_kms_key_policy” {
-  policy_id = “sqs-sms-key-policy-${terraform.workspace}”
+data "aws_iam_policy_document" "sns_kms_key_policy" {
+  policy_id = "sqs-sms-key-policy-${terraform.workspace}"
   
   statement {
-    sid = “Enable IAM User Permissions”
-    actions = [“kms:*”]
+    sid = "Enable IAM User Permissions"
+    actions = ["kms:*"]
     principals = {
-      type = “AWS”
-      identifiers = [“arn:aws:iam::${var.source_account}:root”]
+      type = "AWS"
+      identifiers = ["arn:aws:iam::${var.source_account}:root"]
     }
-    resources = [“*”]
+    resources = ["*"]
   }
   
   statement {
-    sid = “SNS decrypt permission”
-    actions = [“kms:GenerateDataKey*”, “kms:Decrypt”]
+    sid = "SNS decrypt permission"
+    actions = ["kms:GenerateDataKey*:, "kms:Decrypt"]
     principals = {
-      type = “Service”
-      identifiers = [“sns.amazonaws.com”]
+      type = "Service"
+      identifiers = ["sns.amazonaws.com"]
     }
-    resources = [“*”]
+    resources = ["*"]
   }
 }
 
