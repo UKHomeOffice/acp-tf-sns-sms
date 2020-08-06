@@ -1,3 +1,7 @@
+variable "display_name" {
+  description = "Display name for sms messages"
+}
+
 variable "name" {
   description = "A descriptive name for the sms channel"
 }
