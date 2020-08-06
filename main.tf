@@ -35,15 +35,15 @@ data "aws_iam_policy_document" "sms_publish" {
   }
 }
 
-resource "aws_iam_policy" "publish" {
+resource "aws_iam_policy" "sms_publish" {
   name        = "${var.name}-publish-policy"
   description = "Allow publishing to Group SMS SNS Topic"
-  policy      = "${data.aws_iam_policy_document.publish.json}"
+  policy      = "${data.aws_iam_policy_document.sms_publish.json}"
 }
 
 resource "aws_sns_topic_subscription" "sns_sms_subscription" {
-  count     = "${length("${var.target_numbers}")}"
-  topic_arn = "${aws_sns_topic.topic.arn}"
+  count     = length("${var.target_numbers}")
+  topic_arn = aws_sns_topic.sns_topic.arn
   protocol  = "sms"
-  endpoint  = "${element("${var.target_numbers}", count.index)}"
+  endpoint  = element("${var.target_numbers}", count.index)
 }
