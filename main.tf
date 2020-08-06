@@ -28,7 +28,7 @@ data "aws_iam_policy_document" "sns_kms_key_policy" {
   
   statement {
     sid = "SNS decrypt permission"
-    actions = ["kms:GenerateDataKey*:, "kms:Decrypt"]
+    actions = ["kms:GenerateDataKey*", "kms:Decrypt"]
     principals = {
       type = "Service"
       identifiers = ["sns.amazonaws.com"]
