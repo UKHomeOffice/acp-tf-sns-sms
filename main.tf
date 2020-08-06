@@ -16,3 +16,34 @@ resource "aws_sns_topic" "sns_topic" {
   name = "${var.name}-sms-sns-topic"
   kms_master_key_id = aws_kms_alias.sns_kms_key_alias.name
 }
+
+data "aws_iam_policy_document" "sns_assume_role" {
+  statement {
+    actions    = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["sns.amazonaws.com"]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "sms_publish" {
+  statement {
+    actions   = ["sns:Publish"]
+    resources = ["${aws_sns_topic.sns_topic.arn}"]
+  }
+}
+
+resource "aws_iam_policy" "publish" {
+  name        = "${var.name}-publish-policy"
+  description = "Allow publishing to Group SMS SNS Topic"
+  policy      = "${data.aws_iam_policy_document.publish.json}"
+}
+
+resource "aws_sns_topic_subscription" "sns_sms_subscription" {
+  count     = "${length("${var.target_numbers}")}"
+  topic_arn = "${aws_sns_topic.topic.arn}"
+  protocol  = "sms"
+  endpoint  = "${element("${var.target_numbers}", count.index)}"
+}
