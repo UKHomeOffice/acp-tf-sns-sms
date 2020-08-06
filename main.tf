@@ -54,7 +54,7 @@ resource "aws_sns_topic_policy" "sns_from_source_account" {
   policy = data.aws_iam_policy_document.publish_from_source_account_policy.json
 }
 
-data "aws_iam_policy_document" "publish_from_acp_ops_policy" {
+data "aws_iam_policy_document" "publish_from_source_account_policy" {
   policy_id = "${var.name}-sns-sms-policy"
 
   statement {
