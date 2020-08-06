@@ -2,57 +2,9 @@ terraform {
   required_version = ">= 0.12"
 }
 
-data "aws_caller_identity" "current" {}
-
-resource "aws_kms_key" "sns_kms_key" {
-  description             = "KMS key for ${var.name} sns to sms channel"
-  policy = data.aws_iam_policy_document.sns_kms_key_policy.json
-  deletion_window_in_days = 10
-}
-
-resource "aws_kms_alias" "sns_kms_key_alias" {
-  name          = "alias/${var.name}-sns-sms-kms"
-  target_key_id = aws_kms_key.sns_kms_key.key_id
-}
-
-data "aws_iam_policy_document" "sns_kms_key_policy" {
-  policy_id = "${var.name}-sqs-sms-key-policy"
-
-  statement {
-    sid = "Enable Administration"
-    actions = ["kms:*"]
-    principals {
-      type = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
-    }
-    resources = ["*"]
-  }
-  
-  statement {
-    sid = "Enable IAM User Permissions"
-    actions = ["kms:*"]
-    principals {
-      type = "AWS"
-      identifiers = ["arn:aws:iam::${var.source_account}:root"]
-    }
-    resources = ["*"]
-  }
-  
-  statement {
-    sid = "SNS decrypt permission"
-    actions = ["kms:GenerateDataKey*", "kms:Decrypt"]
-    principals {
-      type = "Service"
-      identifiers = ["sns.amazonaws.com"]
-    }
-    resources = ["*"]
-  }
-}
-
 resource "aws_sns_topic" "sns_topic" {
   name = "${var.name}-sms-sns-topic"
   display_name = var.name
-  kms_master_key_id = aws_kms_alias.sns_kms_key_alias.name
 }
 
 data "aws_iam_policy_document" "sns_assume_role" {
@@ -66,18 +18,18 @@ data "aws_iam_policy_document" "sns_assume_role" {
   }
 }
 
-data "aws_iam_policy_document" "sms_publish" {
-  statement {
-    actions   = ["sns:Publish"]
-    resources = ["${aws_sns_topic.sns_topic.arn}"]
-  }
-}
-
-resource "aws_iam_policy" "sms_publish" {
-  name        = "${var.name}-publish-policy"
-  description = "Allow publishing to Group SMS SNS Topic"
-  policy      = "${data.aws_iam_policy_document.sms_publish.json}"
-}
+#data "aws_iam_policy_document" "sms_publish" {
+#  statement {
+#    actions   = ["sns:Publish"]
+#    resources = ["${aws_sns_topic.sns_topic.arn}"]
+#  }
+#}
+#
+#resource "aws_iam_policy" "sms_publish" {
+#  name        = "${var.name}-publish-policy"
+#  description = "Allow publishing to Group SMS SNS Topic"
+#  policy      = "${data.aws_iam_policy_document.sms_publish.json}"
+#}
 
 resource "aws_sns_topic_subscription" "sns_sms_subscription" {
   count     = length("${var.target_numbers}")
