@@ -19,7 +19,7 @@ data "aws_iam_policy_document" "sns_kms_key_policy" {
   statement {
     sid = "Enable IAM User Permissions"
     actions = ["kms:*"]
-    principals = {
+    principals {
       type = "AWS"
       identifiers = ["arn:aws:iam::${var.source_account}:root"]
     }
@@ -29,7 +29,7 @@ data "aws_iam_policy_document" "sns_kms_key_policy" {
   statement {
     sid = "SNS decrypt permission"
     actions = ["kms:GenerateDataKey*", "kms:Decrypt"]
-    principals = {
+    principals {
       type = "Service"
       identifiers = ["sns.amazonaws.com"]
     }
