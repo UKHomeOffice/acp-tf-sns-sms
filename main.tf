@@ -54,7 +54,7 @@ resource "aws_sns_topic_policy" "sns_from_source_account" {
 }
 
 data "aws_iam_policy_document" "publish_from_acp_ops_policy" {
-  policy_id = "__default_policy_ID"
+  policy_id = "${var.name}-sns-sms-policy"
 
   statement {
     actions = [
@@ -72,9 +72,9 @@ data "aws_iam_policy_document" "publish_from_acp_ops_policy" {
     }
 
     resources = [
-      aws_sns_topic.acp_sysdig_monitoring_alerts.arn,
+      aws_sns_topic.sns_topic.arn,
     ]
 
-    sid = "__default_statement_ID"
+    sid = "publish_from_source_account"
   }
 }
