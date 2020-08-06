@@ -8,11 +8,11 @@ resource "aws_kms_key" "sns_kms_key" {
 }
 
 resource "aws_kms_alias" "sns_kms_key_alias" {
-  name          = "alias/${name}-sns-sms-kms"
-  target_key_id = aws_kms_key.kms_key.key_id
+  name          = "alias/${var.name}-sns-sms-kms"
+  target_key_id = aws_kms_key.sns_kms_key.key_id
 }
 
 resource "aws_sns_topic" "sns_topic" {
   name = "${var.name}-sms-sns-topic"
-  kms_master_key_id = aws_kms_alias.kms_key_alias.name
+  kms_master_key_id = aws_kms_alias.sns_kms_key_alias.name
 }
