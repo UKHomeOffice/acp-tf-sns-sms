@@ -47,3 +47,34 @@ resource "aws_sns_topic_subscription" "sns_sms_subscription" {
   protocol  = "sms"
   endpoint  = element("${var.target_numbers}", count.index)
 }
+
+resource "aws_sns_topic_policy" "sns_from_source_account" {
+  arn    = aws_sns_topic.sns_topic.arn
+  policy = data.aws_iam_policy_document.publish_from_source_account_policy.json
+}
+
+data "aws_iam_policy_document" "publish_from_acp_ops_policy" {
+  policy_id = "__default_policy_ID"
+
+  statement {
+    actions = [
+      "SNS:Publish",
+    ]
+
+    effect = "Allow"
+
+    principals {
+      type = "AWS"
+
+      identifiers = [
+        "${var.source_account}",
+      ]
+    }
+
+    resources = [
+      aws_sns_topic.acp_sysdig_monitoring_alerts.arn,
+    ]
+
+    sid = "__default_statement_ID"
+  }
+}
