@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 0.12"
+  required_version = ">= 0.13"
 }
 
 resource "aws_sns_topic" "sns_topic" {
@@ -28,7 +28,7 @@ data "aws_iam_policy_document" "publish_from_source_account_policy" {
       type = "AWS"
 
       identifiers = [
-        "${var.source_account}",
+        var.source_account,
       ]
     }
 
@@ -41,8 +41,8 @@ data "aws_iam_policy_document" "publish_from_source_account_policy" {
 }
 
 resource "aws_sns_topic_subscription" "sns_sms_subscription" {
-  count     = length("${var.target_numbers}")
+  count     = length(var.target_numbers)
   topic_arn = aws_sns_topic.sns_topic.arn
   protocol  = "sms"
-  endpoint  = element("${var.target_numbers}", count.index)
+  endpoint  = var.target_numbers[count.index]
 }
